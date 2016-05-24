@@ -1,0 +1,216 @@
+Project 6                                                 Jeannie Chiem
+
+1. 
+
+a)------------------------------------------------------------------
+int main()
+{
+	int arr[3] = { 5, 10, 15 };
+	int* ptr = arr;
+	int x = 0;
+	
+	*ptr = 30;          // set arr[0] to 30
+	*(ptr + 1) = 20;      // set arr[1] to 20
+	ptr += 2;
+	ptr[0] = 10;        // set arr[2] to 10
+	
+	while (ptr >= arr)
+	{
+		cout << arr[x] << endl;    // print values
+		x++;
+		ptr--;
+	}
+}
+
+b)---------------------------------------------------------------------
+This program wouldn't have worked before the fix because it could not change the pointer in the function. Also, the
+original program wouldn't have worked correctly since it only compared the integers in the array to a single static 
+integer which would probably not have given the max int in the array.
+
+
+void findMax(int arr[], int n, int*& pToMax) //must have a reference to the pointer or else the pointer won't change
+{
+	if (n <= 0)
+		return;      // no items, no maximum!
+
+	int max = 0;
+	int maxPos;
+	for (int i = 0; i < n; i++)
+	{
+		if (arr[i] >= max)
+		{
+			max = arr[i];
+			maxPos = i;
+		}
+	}
+	pToMax = arr + maxPos;
+}
+
+int main()
+{
+	int nums[4] = { 5, 3, 15, 6 };
+	int* ptr = nums;
+
+	findMax(nums, 4, ptr);
+	cout << "The maximum is at address " << ptr << endl;
+	cout << "It's at position " << ptr - nums << endl;
+	cout << "Its value is " << *ptr << endl;
+}
+
+c)------------------------------------------------------------
+The original program wouldn't have worked because the pointer was uninitialized. To fix this, I initialized the
+pointer to an int.
+
+void computeCube(int n, int* ncubed)
+{
+	*ncubed = n * n * n;
+}
+
+int main()
+{
+	int x = 0;
+	int* ptr = &x;
+	computeCube(5, ptr);
+	cout << "Five cubed is " << *ptr << endl;
+}
+
+d)-----------------------------------------------------------------
+This function wouldn't have worked because it tried to compare memory addresses to characters. Another problem was that
+instead of stopping before the zero byte, the program originally only stopped if it found the character 0 which probably
+would't happen and cause an infinite loop. To fix this, I changed the zeroes into zero bytes and set the addresses to
+the objects it actually pointed too.
+
+// return true if two C strings are equal
+bool strequal(const char str1[], const char str2[])
+{
+	while (*str1 != '\0' && *str2 != '\0')
+	{
+		if (*str1 != *str2)  // compare corresponding characters
+			return false;
+		str1++;            // advance to the next character
+		str2++;
+	}
+	return (*str1 == *str2);   // both ended at same time?
+}
+
+int main()
+{
+	char a[15] = "Noor";
+	char b[15] = "Noah";
+
+	if (strequal(a, b))
+		cout << "They're the same person!\n";
+}
+
+e)--------------------------------------------------------------------
+This program is incorrectly treating the pointer as if it were an array which is wrong since pointers can only hold
+memory addresses.
+
+2.
+
+a)	double* cat;
+b)	double mouse[5];
+c)	cat = mouse + 4;
+d)	*cat = 42;
+e)	*(mouse + 3) = 25;
+f)	cat -= 3;
+g)	cat[1] = 17;
+h)	cat[0] = 54;
+i)	bool b(*cat == *(cat + 1));
+j)	bool d(cat == mouse);
+
+
+3.
+
+a)--------------------------------------------------------------------
+
+double mean(const double* scores, int numScores)
+{
+	const double* ptr = scores;
+	double tot = 0;
+	for (int k = 0; k < numScores; k++)
+	{
+		tot += *(ptr + k);
+	}
+	return tot / numScores;
+}
+ 
+b)-----------------------------------------------------------------------
+
+const char* findTheChar(const char* str, char chr)
+{
+	for (int k = 0; *(str + k) != '\0'; k++)
+		if (*(str + k) == chr)
+			return (str + k);
+
+	return nullptr;
+}
+
+c)----------------------------------------------------------------------
+
+
+const char* findTheChar(const char* str, char chr)
+{
+	for (const char* ptr = str; *ptr != '\0'; ptr++)
+		if (*ptr == chr)
+			return ptr;
+
+	return nullptr;
+}
+
+
+4.
+
+a)-----------------------------------------------------------------------
+
+This program prints:
+3
+4
+79
+-1
+9
+22
+19
+and this is because:
+
+    int main()
+    {
+        int array[6] = { 5, 3, 4, 17, 22, 19 };
+					        //the maxwell function returns pointer a if the object it points to is 
+        int* ptr = maxwell(array, &array[2]);     greater than pointer b's object, otherwise it returns pointer b    
+        					  since 5 > 4, pointer a which is equivalent to &array[0] is returned
+	*ptr = -1;    //since pointer a was returned, this sets the int at position 0 to -1                          
+        ptr += 2;     //the pointer is now at position 2 in the array
+        ptr[1] = 9;   //this sets the int one unit ahead of the current position(3) to 9
+        *(array+1) = 79; //this sets the int at position 1 to 79
+
+        cout << &array[5] - ptr << endl; //since two adresses are being operated on, it becomes a simple math problem
+					   ptr is at position 2 and &array[5] is at position 5, the difference is 3
+					   and therefore 3 is printed out
+
+        swap1(&array[0], &array[1]); //this function swaps the address that a and b point to, it is ultimately pointless
+        swap2(array, &array[2]); //this function swaps the objects that a and b point to which swaps the integers at
+                                   these positions in the array; array[0] and array[2] are swapped
+        for (int i = 0; i < 6; i++)
+            cout << array[i] << endl; //this prints out all the integers in the array
+    } 					at this point, the array is {4, 79, -1, 9, 22, 19}
+					which is what gets outputted after the 3
+
+
+5.
+
+a)------------------------------------------------------------------
+
+void removeS(char* ptr)
+{
+	for (char*x = ptr; *x != '\0'; x++)
+	{
+		if (*x == 's' || *x == 'S')
+		{
+			for (x; *x != '\0'; x++)
+				*x = *(x + 1);
+			x = ptr;
+		}
+	}
+}
+
